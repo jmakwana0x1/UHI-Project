@@ -4,3 +4,6 @@
 [submodule "lib/v4-hooks-public"]
 	path = lib/v4-hooks-public
 	url = https://github.com/Uniswap/v4-hooks-public
+[submodule "lib/reactive-lib"]
+	path = lib/reactive-lib
+	url = https://github.com/reactive-network/reactive-lib

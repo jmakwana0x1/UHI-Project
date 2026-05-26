@@ -11,6 +11,8 @@ library Errors {
     error PremiumDeductionFailed();
     error RingBufferOverflow();
     error TwapStale(uint64 ageSeconds);
+    error VaultBypass();
+    error HookDataMalformed();
 
     // ─── Registry ───────────────────────────────────────────────────────────
     error NotCallbackProxy();

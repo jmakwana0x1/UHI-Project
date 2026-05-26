@@ -3,7 +3,7 @@ pragma solidity 0.8.26;
 
 import {FullMath} from "v4-core/libraries/FullMath.sol";
 import {TickMath} from "v4-core/libraries/TickMath.sol";
-import {LiquidityAmounts} from "v4-periphery/libraries/LiquidityAmounts.sol";
+import {LiquidityAmounts} from "@uniswap/v4-core/test/utils/LiquidityAmounts.sol";
 import {FixedPoint96} from "v4-core/libraries/FixedPoint96.sol";
 
 import {Constants} from "../libraries/Constants.sol";
@@ -224,54 +224,53 @@ library DeltaMath {
     // ════════════════════════════════════════════════════════════════════════
     //                          syntheticShortDelta
     // ════════════════════════════════════════════════════════════════════════
-
     /// @notice Credited synthetic short ETH delta for an above-range position.
-    /// @dev    The credit is the position's maximum ETH content (which it would
-    ///         hold if price re-entered the range), weighted by touch
-    ///         probability. Returns negative because it's a short.
-    ///
-    ///         For an above-range position: holds 100% ETH (in v4 terms,
-    ///         100% of token1 if USDC is token0). Maximum ETH content is
-    ///         the amount it'd hold at sqrt-price == sqrtA.
-    /// @param liquidity        Position liquidity.
-    /// @param sqrtPriceLower   Lower tick sqrt-price (range floor).
-    /// @param sqrtPriceUpper   Upper tick sqrt-price (range ceiling).
-    /// @param touchProbE18     Touch probability from `touchProbability`.
-    /// @param usdcIsToken0     True if USDC is token0.
-    /// @return deltaE18        Signed ETH delta, negative (short side).
-    function syntheticShortDelta(
-        uint128 liquidity,
-        uint160 sqrtPriceLower,
-        uint160 sqrtPriceUpper,
-        uint128 touchProbE18,
-        bool usdcIsToken0
-    ) internal pure returns (int256 deltaE18) {
-        if (liquidity == 0 || touchProbE18 == 0) return 0;
-        if (sqrtPriceUpper <= sqrtPriceLower) return 0;
+/// @dev    The credit is the position's maximum ETH content (which it would
+///         hold if price re-entered the range), weighted by touch
+///         probability. Returns negative because it's a short.
+///
+///         For an above-range position: holds 100% ETH (in v4 terms,
+///         100% of token1 if USDC is token0). Maximum ETH content is
+///         the amount it'd hold at sqrt-price == sqrtB (upper bound),
+///         i.e. when the position is fully in token1.
+/// @param liquidity        Position liquidity.
+/// @param sqrtPriceLower   Lower tick sqrt-price (range floor).
+/// @param sqrtPriceUpper   Upper tick sqrt-price (range ceiling).
+/// @param touchProbE18     Touch probability from `touchProbability`.
+/// @param usdcIsToken0     True if USDC is token0.
+/// @return deltaE18        Signed ETH delta, negative (short side).
+function syntheticShortDelta(
+    uint128 liquidity,
+    uint160 sqrtPriceLower,
+    uint160 sqrtPriceUpper,
+    uint128 touchProbE18,
+    bool usdcIsToken0
+) internal pure returns (int256 deltaE18) {
+    if (liquidity == 0 || touchProbE18 == 0) return 0;
+    if (sqrtPriceUpper <= sqrtPriceLower) return 0;
 
-        // Maximum ETH content of the position = amount of ETH if price were
-        // at the lower bound. Use LiquidityAmounts with sqrtPrice = sqrtA.
-        (uint256 amount0, uint256 amount1) = LiquidityAmounts.getAmountsForLiquidity(
-            sqrtPriceLower,
-            sqrtPriceLower,
-            sqrtPriceUpper,
-            liquidity
-        );
+    // Maximum ETH content = amount of ETH when price is at the upper bound,
+    // i.e. the position is entirely in token1 (ETH, when usdcIsToken0=true).
+    // Passing sqrtPriceUpper as the current price gives amount0=0, amount1=full ETH.
+    (uint256 amount0, uint256 amount1) = LiquidityAmounts.getAmountsForLiquidity(
+        sqrtPriceUpper,   // current price at upper bound → 100% ETH side
+        sqrtPriceLower,
+        sqrtPriceUpper,
+        liquidity
+    );
 
-        uint256 maxEth = usdcIsToken0 ? amount1 : amount0;
-        if (maxEth == 0) return 0;
+    uint256 maxEth = usdcIsToken0 ? amount1 : amount0;
+    if (maxEth == 0) return 0;
 
-        // Weighted credit = maxEth · touchProb
-        uint256 weighted = FullMath.mulDiv(maxEth, uint256(touchProbE18), Constants.E18);
+    // Weighted credit = maxEth · touchProb
+    uint256 weighted = FullMath.mulDiv(maxEth, uint256(touchProbE18), Constants.E18);
 
-        // Sign: short, so negative.
-        // Saturate at -int256.max to be safe.
-        if (weighted > uint256(type(int256).max)) {
-            return type(int256).min + 1; // avoid the asymmetric min-int oddity
-        }
-        return -int256(weighted);
+    // Sign: short, so negative.
+    if (weighted > uint256(type(int256).max)) {
+        return type(int256).min + 1;
     }
-
+    return -int256(weighted);
+}
     // ════════════════════════════════════════════════════════════════════════
     //                          Private helpers
     // ════════════════════════════════════════════════════════════════════════

@@ -79,16 +79,24 @@ contract CrossHedgeHookTest is BaseTest {
             constructorArgs
         );
 
-        // Deploy via CREATE2 — Foundry routes through 0x4e59... automatically
-        // when we use the {salt:} syntax.
-        hook = new CrossHedgeHook{salt: salt}(
-            IPoolManager(address(pm)),
-            INettingRegistry(address(registry)),
-            vault,
-            uint16(30),
-            usdcIsToken0_
+        // Deploy via the canonical CREATE2 deployer (0x4e59...) explicitly.
+        // We can't use `new Contract{salt:}` because that uses `address(this)`
+        // as the deployer in Foundry, while HookMiner.find assumes 0x4e59...
+        bytes memory deployCode = abi.encodePacked(
+            type(CrossHedgeHook).creationCode,
+            constructorArgs
         );
-
+        bytes memory deployPayload = abi.encodePacked(salt, deployCode);
+        (bool ok, bytes memory ret) = HookDeployer.CREATE2_DEPLOYER.call(deployPayload);
+        require(ok, "CREATE2 deploy failed");
+        address deployedAddr;
+        if (ret.length >= 20) {
+            assembly { deployedAddr := mload(add(ret, 20)) }
+        } else {
+            deployedAddr = hookAddr; // some CREATE2 deployers return empty
+        }
+        hook = CrossHedgeHook(hookAddr);
+        require(address(hook).code.length > 0, "Hook not deployed");
         require(address(hook) == hookAddr, "Hook address mismatch");
 
         // Build PoolKey

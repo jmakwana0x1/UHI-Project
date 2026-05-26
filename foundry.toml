@@ -1,6 +1,37 @@
 [profile.default]
+solc = "0.8.26"
+evm_version = "cancun"             # for transient storage (v4 uses it)
+optimizer = true
+optimizer_runs = 200
+via_ir = true                       # required for stack-too-deep in hooks
 src = "src"
+test = "test"
+script = "script"
 out = "out"
 libs = ["lib"]
+fs_permissions = [{ access = "read", path = "./" }]
+gas_reports = ["CrossHedgeHook", "CrossHedgeVault", "NettingRegistry"]
+
+[profile.ci]
+fuzz = { runs = 1024 }
+invariant = { runs = 256, depth = 500 }
+
+[profile.deep]
+fuzz = { runs = 10000 }
+invariant = { runs = 1024, depth = 1000 }
+
+[fmt]
+line_length = 110
+tab_width = 4
+bracket_spacing = true
+
+[rpc_endpoints]
+unichain_sepolia = "${UNICHAIN_SEPOLIA_RPC}"
+base_sepolia     = "${BASE_SEPOLIA_RPC}"
+reactive_lasna   = "${REACTIVE_LASNA_RPC}"
+
+[etherscan]
+unichain_sepolia = { key = "${UNISCAN_API_KEY}" }
+base_sepolia     = { key = "${BASESCAN_API_KEY}" }
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

@@ -93,6 +93,15 @@ contract VaultProxy is IVaultProxy {
     //                          IRebatePayer surface
     // ═══════════════════════════════════════════════════════════════════════
 
+    /// @notice Acknowledge accrued liability (no-op on remote proxies).
+    /// @dev    Remote proxies don't track totalAssets like the home-chain
+    ///         vault does, so we just consume the callback to satisfy the
+    ///         interface. The home-chain vault is the canonical solvency
+    ///         tracker; remote proxies are pure payout endpoints.
+    function accrueLiability(uint256 /*amount*/) external onlyNettingRegistry {
+        // intentional no-op for remote-chain proxies
+    }
+
     /// @notice Pay a rebate locally. Only callable by the local NettingRegistry.
     function payRebate(address to, uint256 amount) external onlyNettingRegistry {
         if (to == address(0)) revert Errors.ZeroAddress();

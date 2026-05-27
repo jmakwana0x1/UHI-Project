@@ -395,15 +395,23 @@ contract NettingRegistryTest is Test {
         bytes32 matchId = keccak256("m1");
         _recordMatch(matchId, aliceLongId, bobShortId, 1_000_000e6);
 
-        vm.warp(block.timestamp + 1 days);
+        uint64 t0 = uint64(block.timestamp);
+
+        vm.warp(t0 + 1 days);
         _settle(matchId, false);
         uint128 after1d = registry.accruedRebate(bobShortId);
+        emit log_named_uint("after1d", after1d);
+        emit log_named_uint("block.timestamp after warp1", block.timestamp);
 
-        vm.warp(block.timestamp + 1 days);
+        vm.warp(t0 + 2 days);
         _settle(matchId, false);
         uint128 after2d = registry.accruedRebate(bobShortId);
+        emit log_named_uint("after2d", after2d);
+        emit log_named_uint("block.timestamp after warp2", block.timestamp);
 
-        // Second day should add roughly the same amount
+        // Second day should roughly double the first
+        assertGt(after2d, after1d);
+        // The delta should be ~equal to first day's accrual
         assertApproxEqRel(after2d - after1d, after1d, 0.01e18);
     }
 

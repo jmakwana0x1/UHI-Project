@@ -2,11 +2,18 @@
 pragma solidity 0.8.26;
 
 /// @title IRebatePayer
-/// @notice Common surface that both the home-chain Vault and the remote-chain
-///         VaultProxy implement so the NettingRegistry can pay rebates without
-///         caring which kind of contract sits behind the address.
+/// @notice Shared surface for any contract that holds USDC to pay out rebates.
+///         Implemented by:
+///           - CrossHedgeVault (home chain)
+///           - VaultProxy (remote chains)
 interface IRebatePayer {
-    /// @notice Pay a rebate amount in USDC to the specified recipient.
-    /// @dev MUST revert if caller is not the local NettingRegistry.
+    /// @notice Pay a rebate amount to a recipient. Only callable by the
+    ///         NettingRegistry that's wired in at construction time.
     function payRebate(address to, uint256 amount) external;
+
+    /// @notice Credit an accrued-but-not-yet-paid rebate liability on the
+    ///         payer's books. Called by the NettingRegistry when it accrues
+    ///         rebate to a short LP, so the payer's solvency accounting
+    ///         (e.g., totalAssets() on an ERC4626 vault) is accurate.
+    function accrueLiability(uint256 amount) external;
 }

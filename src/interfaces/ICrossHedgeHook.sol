@@ -28,4 +28,14 @@ interface ICrossHedgeHook {
 
     /// @notice Address of the vault (used by registry to verify hook config).
     function vault() external view returns (address);
+
+    /// @notice Read the TWAP sqrt-price over a window from the hook's ring buffer.
+    /// @param poolId The pool to read.
+    /// @param windowSeconds Lookback window in seconds.
+    /// @return meanSqrt The arithmetic-mean sqrt-price (Q64.96) over the window.
+    /// @return sampleCount Number of snapshots that fell within the window.
+    function readTwapSqrtPrice(PoolId poolId, uint32 windowSeconds)
+        external
+        view
+        returns (uint160 meanSqrt, uint32 sampleCount);
 }

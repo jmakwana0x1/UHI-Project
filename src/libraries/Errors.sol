@@ -50,4 +50,5 @@ library Errors {
     error Unauthorized();
     error ZeroAddress();
     error Unimplemented();
+    error SwapCapExceeded(uint256 attempted, uint256 cap);
 }

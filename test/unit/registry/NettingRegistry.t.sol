@@ -44,6 +44,9 @@ contract MockHook is ICrossHedgeHook {
     // Unused by registry but required by interface
     function harvestPremiums(address) external pure override returns (uint256) { return 0; }
     function premiumBalance() external pure override returns (uint256) { return 0; }
+    function readTwapSqrtPrice(PoolId, uint32) external pure override returns (uint160, uint32) {
+        return (uint160(1 << 96), 10);
+    }
 }
 
 /// @notice Mock rebate payer that records payouts.
@@ -65,6 +68,10 @@ contract MockRebatePayer is IRebatePayer {
         lastTo = to;
         lastAmount = amount;
         totalPaid += amount;
+    }
+
+    function accrueLiability(uint256) external override {
+        // no-op for tests; we just need the function to exist
     }
 }
 

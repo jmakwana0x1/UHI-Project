@@ -330,6 +330,10 @@ contract NettingRegistry is INettingRegistry {
         accruedRebate[m.shortPosId] = newBal;
         m.lastAccrualAt = nowTs;
 
+        // Inform the rebatePayer (vault on home chain, proxy on remotes) so
+        // its solvency accounting includes this pending liability.
+        rebatePayer.accrueLiability(uint256(credited));
+
         emit RebateAccrued(m.shortPosId, credited, nowTs);
     }
 }

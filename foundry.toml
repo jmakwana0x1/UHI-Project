@@ -9,7 +9,10 @@ test = "test"
 script = "script"
 out = "out"
 libs = ["lib"]
-fs_permissions = [{ access = "read", path = "./" }]
+fs_permissions = [
+    { access = "read", path = "./" },
+    { access = "read-write", path = "./deployments" }
+]
 gas_reports = ["CrossHedgeHook", "CrossHedgeVault", "NettingRegistry"]
 
 [profile.ci]

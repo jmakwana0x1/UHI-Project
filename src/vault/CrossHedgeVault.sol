@@ -480,9 +480,12 @@ contract CrossHedgeVault is ERC4626, ICrossHedgeVault, IUnlockCallback {
         uint256 priceE18 = (priceX96 * 1e18) >> 96;
         if (priceE18 == 0) priceE18 = 1;
         // If USDC is token0: price = token1/token0 = WETH/USDC.
-        //   usdc = weth / price
-        // We return usdc in the same scale as wethAmount for the mock's model.
-        return wethAmount * 1e18 / priceE18;
+        //   usdc = weth / price.
+        // Return usdc in the same scale as wethAmount.
+        uint256 raw = wethAmount * 1e18 / priceE18;
+        // 5% buffer covers swap-fee precision loss; excess returns as USDC
+        // credit on settle, so this overestimate is economically free.
+        return raw * 105 / 100;
     }
 
     // ═══════════════════════════════════════════════════════════════════════

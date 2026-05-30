@@ -230,6 +230,17 @@ contract CrossHedgeHook is BaseHook, ICrossHedgeHook {
                 hookDelta = usdcIsToken0
                     ? toBalanceDelta(int128(premium), int128(0))
                     : toBalanceDelta(int128(0), int128(premium));
+
+                // ─── Phase 5 fix: claim the hook's positive delta ────────
+                // v4 applies hookDelta to the hook's account (positive = owed).
+                // Without a matching take(), the delta stays unsettled and
+                // unlockCallback reverts with CurrencyNotSettled. This was
+                // invisible against MockPoolManager (whose take() is a no-op
+                // and which doesn't track hook-side deltas) but real v4
+                // enforces it strictly.
+                Currency usdcCurrency = usdcIsToken0 ? key.currency0 : key.currency1;
+                poolManager.take(usdcCurrency, address(this), raw);
+
                 emit PremiumCollected(pid, posId, premium);
             }
         }

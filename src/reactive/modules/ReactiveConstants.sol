@@ -16,7 +16,7 @@ pragma solidity 0.8.26;
 ///         throttle internally via lastCronTick comparison.
 library ReactiveConstants {
     // ─── Chain IDs ─────────────────────────────────────────────────────────
-    uint256 internal constant LASNA_CHAIN_ID = 5318008;
+    uint256 internal constant LASNA_CHAIN_ID = 5318007;
     uint256 internal constant UNICHAIN_SEPOLIA_CHAIN_ID = 1301;
     uint256 internal constant BASE_SEPOLIA_CHAIN_ID = 84532;
 

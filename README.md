@@ -205,19 +205,37 @@ CrossHedge's `NettingRegistry` has a built-in watchdog that detects the silence:
 
 **Deployer (one-use):** `0x2f328Ef3a09e2328EE4cC9D6D52031eD4946575c`
 
-| Contract | Unichain Sepolia (1301) | Base Sepolia (84532) |
-|---|---|---|
-| MockUSDC | `0x2f5ECDc6...3b8a` | `0x2f5ECDc6...3b8a` |
-| MockWETH | `0x6038F4b3...07F1` | `0x6038F4b3...07F1` |
-| NettingRegistry | `0xF1c02abe...2780` | `0xF1c02abe...2780` |
-| CrossHedgeVault | `0x857C617D...7b48` | `0x857C617D...7b48` |
-| CrossHedgeHook | `0x3300fD81...95C2` | `0x42F4a5f6...55c2` |
-| Uniswap PoolManager | `0x00B036B5...62AC` | `0x05E73354...3408` |
+All addresses are clickable links to block explorers.
+
+**Unichain Sepolia (chainId 1301):**
+
+| Contract | Address |
+|---|---|
+| MockUSDC | [`0x2f5ECDc61B9d314cD091840F6E7Acd9cfBae3b8a`](https://sepolia.uniscan.xyz/address/0x2f5ECDc61B9d314cD091840F6E7Acd9cfBae3b8a) |
+| MockWETH | [`0x6038F4b3135a1e46f23e6dc0A9AEE78209BE07F1`](https://sepolia.uniscan.xyz/address/0x6038F4b3135a1e46f23e6dc0A9AEE78209BE07F1) |
+| NettingRegistry | [`0xF1c02abee44BdD90807212fC2e8736f96F732780`](https://sepolia.uniscan.xyz/address/0xF1c02abee44BdD90807212fC2e8736f96F732780) |
+| CrossHedgeVault | [`0x857C617DE825Cc7CfAD24E416D3D6BE62A7d7b48`](https://sepolia.uniscan.xyz/address/0x857C617DE825Cc7CfAD24E416D3D6BE62A7d7b48) |
+| CrossHedgeHook | [`0x3300fD81b9Df1e9bc71B299FCD7e3fB6C15895C2`](https://sepolia.uniscan.xyz/address/0x3300fD81b9Df1e9bc71B299FCD7e3fB6C15895C2) |
+| Uniswap v4 PoolManager | [`0x00B036B58a818B1BC34d502D3fE730Db729e62AC`](https://sepolia.uniscan.xyz/address/0x00B036B58a818B1BC34d502D3fE730Db729e62AC) |
+
+**Base Sepolia (chainId 84532):**
+
+| Contract | Address |
+|---|---|
+| MockUSDC | [`0x2f5ECDc61B9d314cD091840F6E7Acd9cfBae3b8a`](https://sepolia.basescan.org/address/0x2f5ECDc61B9d314cD091840F6E7Acd9cfBae3b8a) |
+| MockWETH | [`0x6038F4b3135a1e46f23e6dc0A9AEE78209BE07F1`](https://sepolia.basescan.org/address/0x6038F4b3135a1e46f23e6dc0A9AEE78209BE07F1) |
+| NettingRegistry | [`0xF1c02abee44BdD90807212fC2e8736f96F732780`](https://sepolia.basescan.org/address/0xF1c02abee44BdD90807212fC2e8736f96F732780) |
+| CrossHedgeVault | [`0x857C617DE825Cc7CfAD24E416D3D6BE62A7d7b48`](https://sepolia.basescan.org/address/0x857C617DE825Cc7CfAD24E416D3D6BE62A7d7b48) |
+| CrossHedgeHook | [`0x42F4a5f6ab673F614C0152D7481b9e9416C455c2`](https://sepolia.basescan.org/address/0x42F4a5f6ab673F614C0152D7481b9e9416C455c2) |
+| Uniswap v4 PoolManager | [`0x05E73354cFDd6745C338b50BcFDfA3Aa6fA03408`](https://sepolia.basescan.org/address/0x05E73354cFDd6745C338b50BcFDfA3Aa6fA03408) |
 
 **Reactive Lasna (chainId 5318007):**
-- MatchingRSC: `0x2f5ECDc61B9d314cD091840F6E7Acd9cfBae3b8a`
-- StrategyRSC_unichain: `0x6038F4b3135a1e46f23e6dc0A9AEE78209BE07F1`
-- StrategyRSC_base: `0xF1c02abee44BdD90807212fC2e8736f96F732780`
+
+| Contract | Address |
+|---|---|
+| MatchingRSC | [`0x2f5ECDc61B9d314cD091840F6E7Acd9cfBae3b8a`](https://lasna.reactscan.net/address/0x2f5ECDc61B9d314cD091840F6E7Acd9cfBae3b8a) |
+| StrategyRSC_unichain | [`0x6038F4b3135a1e46f23e6dc0A9AEE78209BE07F1`](https://lasna.reactscan.net/address/0x6038F4b3135a1e46f23e6dc0A9AEE78209BE07F1) |
+| StrategyRSC_base | [`0xF1c02abee44BdD90807212fC2e8736f96F732780`](https://lasna.reactscan.net/address/0xF1c02abee44BdD90807212fC2e8736f96F732780) |
 
 ---
 
@@ -360,7 +378,7 @@ Keep `DEPLOYER_PRIVATE_KEY` in your shell environment; the deploy scripts read i
 
 ```bash
 export SEPOLIA_RPC="https://ethereum-sepolia.publicnode.com"
-export LASNA_RPC="https://lasna-omni-rpc.rnk.dev/"   # post-Omni canonical endpoint
+export LASNA_RPC="https://lasna-rpc.rnk.dev/"        # Reactive Lasna (canonical, what the Sepolia faucet bridges to)
 export UNICHAIN_SEPOLIA_RPC="https://unichain-sepolia.g.alchemy.com/v2/<your-key>"
 export BASE_SEPOLIA_RPC="https://sepolia.base.org"
 ```
@@ -379,20 +397,26 @@ You need testnet native tokens on three chains:
    Base Sepolia      | 0.02 ETH   | https://www.alchemy.com/faucets/base-sepolia
 ```
 
-**For Lasna funding**: ⚠️ **READ THIS WHOLE PARAGRAPH BEFORE BRIDGING.**
+**For Lasna funding:** Reactive Network has two RPC endpoints sharing chain ID `5318007`:
 
-There are currently **two Lasna chains** sharing chain ID `5318007`:
+| Endpoint | What it is |
+|---|---|
+| `https://lasna-rpc.rnk.dev/` | **Canonical Lasna** — Reactive's primary test chain. This is what the public Sepolia faucet bridges to and what our deploy scripts target. |
+| `https://lasna-omni-rpc.rnk.dev/` | A separate testnet exposing newer Omni-fork system contracts. Same chain ID but different system contract bytecode. Not used by our deploy. |
 
-| Endpoint | Status | What our code targets |
-|---|---|---|
-| `https://lasna-rpc.rnk.dev/` | Legacy (pre-Omni fork) | Bridge contract `0x9b9BB25f...` on Sepolia routes HERE by default |
-| `https://lasna-omni-rpc.rnk.dev/` | **Active post-Omni chain** | Our deploy scripts target this (canonical) |
+The bridge contract `0x9b9BB25f1A81078C544C829c5EB7822d747Cf434` on Ethereum Sepolia is the canonical funding path — it routes lREACT to your address on `lasna-rpc.rnk.dev`. The rate is roughly 1 Sepolia ETH → 100 lREACT.
 
-The two chains have the **same chain ID but different system contracts** (verifiable: `cast code 0x0000000000000000000000000000000000fffFfF` returns very different bytecode on each). The Omni chain is the active one Reactive Network is mining and developing against; the legacy chain is mostly frozen.
+To bridge ~5 lREACT (enough for the three RSC deploys):
 
-If you bridge naively via the documented Sepolia faucet contract, your lREACT will end up on the **legacy chain** and be effectively stranded for our purposes. **Before bridging**, ask in Reactive's Discord/Telegram for the current canonical funding path to Omni Lasna — at the time of writing it was being clarified by their team.
+```bash
+cast send 0x9b9BB25f1A81078C544C829c5EB7822d747Cf434 \
+  --rpc-url $SEPOLIA_RPC \
+  --private-key $DEPLOYER_PRIVATE_KEY \
+  "request(address)" $(cast wallet address --private-key $DEPLOYER_PRIVATE_KEY) \
+  --value 0.05ether
+```
 
-The author of this runbook successfully obtained Omni-Lasna lREACT . If you're following these steps fresh, contact Reactive's team directly first.
+Relay takes ~1-5 minutes; poll `cast balance` on Lasna to confirm arrival.
 
 To verify funds landed where intended:
 
@@ -400,7 +424,7 @@ To verify funds landed where intended:
 DEPLOYER_ADDR=$(cast wallet address --private-key "$DEPLOYER_PRIVATE_KEY")
 
 # THIS is the balance that matters
-cast balance $DEPLOYER_ADDR --rpc-url https://lasna-omni-rpc.rnk.dev/
+cast balance $DEPLOYER_ADDR --rpc-url https://lasna-rpc.rnk.dev/
 # Should be at least 5000000000000000000 (5 lREACT)
 ```
 
@@ -432,7 +456,7 @@ This will:
 
 1. **Preflight**: verify all three balances meet the minimums.
 2. **Predict addresses**: compute deterministic deployment addresses for all contracts. Writes `deployments/predictions.json`.
-3. **Lasna RSCs** (if `SKIP_LASNA=0`): deploy MatchingRSC + 2x StrategyRSC on Lasna; fund each with 1 lREACT. Writes `deployments/lasna.json`. **Currently skipped pending Omni SDK** — see §5.
+3. **Lasna RSCs:** deploy MatchingRSC + 2x StrategyRSC on Reactive Lasna using `forge create --value 1ether` (the canonical pattern from Reactive's own demos — see the script source for the exact commands).
 4. **Unichain Sepolia origin**: deploy MockUSDC, MockWETH, NettingRegistry, CrossHedgeVault, and mine + deploy CrossHedgeHook via CREATE2. Initialize the pool and seed the vault with 10M USDC. Writes `deployments/1301.json`.
 5. **Base Sepolia origin**: same as above on Base. Writes `deployments/84532.json`.
 

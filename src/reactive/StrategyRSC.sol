@@ -77,7 +77,7 @@ contract StrategyRSC is AbstractReactive {
         uint64 _callbackGasLimit,
         uint16 _alphaBps,
         uint256[] memory subscribeChainIds
-    ) {
+    ) payable {
         if (_vaultAddress == address(0)) revert Errors.ZeroAddress();
         if (_homeChainId == 0) revert Errors.ZeroAddress(); // reuse: invalid config
 

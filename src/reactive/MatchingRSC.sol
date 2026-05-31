@@ -101,7 +101,7 @@ contract MatchingRSC is AbstractReactive {
         uint64 _callbackGasLimit,
         uint16 _fIntBps,
         uint16 _alphaBps
-    ) {
+    ) payable {
         if (subscribeChainIds.length != chainRegistries.length) {
             revert Errors.ZeroAddress(); // reuse: arity mismatch
         }

@@ -31,10 +31,12 @@ library ReactiveConstants {
     // These are the topic_0 values emitted by the system contract on each
     // cron interval. We use placeholders; the actual values are network-
     // specific and confirmed at deployment time (Phase 5).
+    // Cron10: emitted by Lasna system contract every 10 blocks (~1 min)
     uint256 internal constant CRON_TOPIC_FAST_PLACEHOLDER =
-        uint256(keccak256("CRON_FAST"));
+        0x04463f7c1651e6b9774d7f85c85bb94654e3c46ca79b0c16fb16d4183307b687;
+    // Cron100: emitted every 100 blocks (~12 min)
     uint256 internal constant CRON_TOPIC_SLOW_PLACEHOLDER =
-        uint256(keccak256("CRON_SLOW"));
+        0xb49937fb8970e19fd46d48f7e3fb00d659deac0347f79cd7cb542f0fc1503c70;
 
     // ─── Origin-chain event topic hashes ──────────────────────────────────
     // keccak256 of the canonical event signatures. These must match exactly

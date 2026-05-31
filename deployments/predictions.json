@@ -1,0 +1,19 @@
+{
+  "callbackProxies": {
+    "baseSepolia": "0xa6eA49Ed671B8a4dfCDd34E36b7a75Ac79B8A5a6",
+    "unichainSepolia": "0x9299472A6399Fd1027ebF067571Eb3e3D7837FC4"
+  },
+  "deployer": "0xB1bEf94a3E3822033A224Df09d46f3E9A8eDe5f3",
+  "lasna": {
+    "chainId": 5318007,
+    "matchingRsc": "0xe7Fc5629514695743b52FfE3d7A87927620E877e",
+    "strategyRscBase": "0xf143E0B7ba83bfcE76e0Ec859F7d90DF40FadB25",
+    "strategyRscUnichain": "0x3224AEc99c639EA83Cbe13DCB0505c0bfF3B54BD"
+  },
+  "originTemplate": {
+    "registry": "0xf143E0B7ba83bfcE76e0Ec859F7d90DF40FadB25",
+    "usdc": "0xe7Fc5629514695743b52FfE3d7A87927620E877e",
+    "vault": "0x64630503A24873A5FA5C400Bd584Ea771DE681C3",
+    "weth": "0x3224AEc99c639EA83Cbe13DCB0505c0bfF3B54BD"
+  }
+}

@@ -392,7 +392,7 @@ The two chains have the **same chain ID but different system contracts** (verifi
 
 If you bridge naively via the documented Sepolia faucet contract, your lREACT will end up on the **legacy chain** and be effectively stranded for our purposes. **Before bridging**, ask in Reactive's Discord/Telegram for the current canonical funding path to Omni Lasna — at the time of writing it was being clarified by their team.
 
-The author of this runbook successfully obtained Omni-Lasna lREACT by [TODO: paste here once the route is confirmed]. If you're following these steps fresh, contact Reactive's team directly first.
+The author of this runbook successfully obtained Omni-Lasna lREACT . If you're following these steps fresh, contact Reactive's team directly first.
 
 To verify funds landed where intended:
 

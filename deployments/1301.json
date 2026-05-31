@@ -1,0 +1,19 @@
+{
+  "callbackProxy": "0x9299472A6399Fd1027ebF067571Eb3e3D7837FC4",
+  "chainId": 1301,
+  "chainName": "Unichain Sepolia",
+  "deployedAtBlock": 53320055,
+  "deployer": "0xB1bEf94a3E3822033A224Df09d46f3E9A8eDe5f3",
+  "fee": 3000,
+  "hook": "0xb4597B811c57D6C9832C4e36fA06744Cd48055c2",
+  "initialVaultUsdc": 10000000000000,
+  "matchingRvm": "0xe7Fc5629514695743b52FfE3d7A87927620E877e",
+  "poolManager": "0x00B036B58a818B1BC34d502D3fE730Db729e62AC",
+  "registry": "0xf143E0B7ba83bfcE76e0Ec859F7d90DF40FadB25",
+  "strategyRvm": "0x3224AEc99c639EA83Cbe13DCB0505c0bfF3B54BD",
+  "tickSpacing": 60,
+  "usdc": "0xe7Fc5629514695743b52FfE3d7A87927620E877e",
+  "usdcIsToken0": false,
+  "vault": "0x64630503A24873A5FA5C400Bd584Ea771DE681C3",
+  "weth": "0x3224AEc99c639EA83Cbe13DCB0505c0bfF3B54BD"
+}

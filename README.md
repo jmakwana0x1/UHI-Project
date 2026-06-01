@@ -106,7 +106,7 @@ Every row below is backed by a clickable on-chain artifact.
 |---|---|---|
 | Hook fires on real v4 with full premium flow (`PremiumCollected`, `LPPositionOpened`, `PriceSnapshot`) | ✅ verified | [Unichain Sepolia tx](https://sepolia.uniscan.xyz/tx/0x92fd5dcb98bacbf1b836225c1071365a2e35900e8168e0472c2c5cbdb43f594c) |
 | Hook fires on Base Sepolia too (second smoke test) | ✅ verified | [Base Sepolia tx](https://sepolia.basescan.org/tx/0xddafb39f214e37916eac0b7bcdbbea8a4f64d17a4f68f1873eba97b6535beeb1) |
-| Origin contracts deployed at predicted addresses on both chains | ✅ verified | Click any contract address in the deployments table, same address on both chains by construction |
+| Origin contracts deployed at predicted addresses on both chains | ✅ verified | Click any contract address in the deployments table, same address on both chains by construction. **Source code verified on both scanners** for all 5 production contracts. |
 | All 3 RSCs deployed at predicted addresses on Reactive Lasna | ✅ verified | [MatchingRSC on Lasna scanner](https://lasna.reactscan.net/address/0x2f5ECDc61B9d314cD091840F6E7Acd9cfBae3b8a) |
 | **Cross-chain event delivery: Unichain hook → MatchingRSC**. MatchingRSC.react() runs `_handlePositionOpened` and emits `CandidateAdded` | ✅ verified | [Lasna REACT tx](https://lasna.reactscan.net/tx/0x8e6a1c1b45334a50585d6a36cba2f3fdfcf5c3a474e82a274a6acd6387eb17bd), origin tx `0x92fd5dcb…` on Unichain |
 | **Cross-chain event delivery: Base hook → StrategyRSC**. PriceSnapshot from Base hook triggers StrategyRSC_base.react() which emits `SnapshotProcessed` | ✅ verified | [Lasna REACT tx](https://lasna.reactscan.net/tx/0xba68f2a07d512a2b738e5915808162355b92c5bcc055c2267b012c9174fc7919), origin tx `0xddafb39f…` on Base Sepolia |
@@ -329,7 +329,7 @@ forge coverage --report summary
 
 **Deployer (one-use):** `0x2f328Ef3a09e2328EE4cC9D6D52031eD4946575c`
 
-All addresses are clickable links to block explorers.
+All addresses are clickable links to block explorers. **Contracts on Unichain Sepolia and Base Sepolia have verified source** — clicking any address opens the annotated Solidity code on the scanner (uniscan.xyz or sepolia.basescan.org). Reactive Lasna scanner support for source verification is limited; the RSC bytecode is verifiable via `cast code`.
 
 **Unichain Sepolia (chainId 1301):**
 

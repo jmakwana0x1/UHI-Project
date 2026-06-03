@@ -249,11 +249,13 @@ function syntheticShortDelta(
     if (liquidity == 0 || touchProbE18 == 0) return 0;
     if (sqrtPriceUpper <= sqrtPriceLower) return 0;
 
-    // Maximum ETH content = amount of ETH when price is at the upper bound,
-    // i.e. the position is entirely in token1 (ETH, when usdcIsToken0=true).
-    // Passing sqrtPriceUpper as the current price gives amount0=0, amount1=full ETH.
+    // Maximum ETH content depends on which token is ETH:
+    //   - usdcIsToken0=true:  ETH is token1. At price=upper, position is 100% token1.
+    //   - usdcIsToken0=false: ETH is token0. At price=lower, position is 100% token0.
+    // Evaluate at the price where the position is fully composed of ETH.
+    uint160 evalPrice = usdcIsToken0 ? sqrtPriceUpper : sqrtPriceLower;
     (uint256 amount0, uint256 amount1) = LiquidityAmounts.getAmountsForLiquidity(
-        sqrtPriceUpper,   // current price at upper bound → 100% ETH side
+        evalPrice,
         sqrtPriceLower,
         sqrtPriceUpper,
         liquidity

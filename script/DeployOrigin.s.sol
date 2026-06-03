@@ -131,9 +131,13 @@ contract DeployOrigin is Script {
         );
 
         // ─── nonce 2: NettingRegistry ──────────────────────────────────
+        // Note: authorizedMatchingRvmId is the DEPLOYER address, not the MatchingRSC's
+        // contract address. This matches Reactive's AbstractCallback convention where
+        // rvm_id = msg.sender (= the deployer wallet) in the RSC's constructor.
+        // Callbacks from MatchingRSC arrive with tx.origin = deployer wallet.
         NettingRegistry registry = new NettingRegistry(
             callbackProxy,
-            matchingRvm,
+            deployer,           // ← was matchingRvm (RSC address); now deployer (wallet)
             ICrossHedgeHook(hookAddr),
             IRebatePayer(predictedVault),
             WATCHDOG_INTERVAL,
@@ -142,13 +146,15 @@ contract DeployOrigin is Script {
         require(address(registry) == predictedRegistry, "registry address mismatch");
 
         // ─── nonce 3: CrossHedgeVault ──────────────────────────────────
+        // Note: authorizedStrategyRvmId is the DEPLOYER (same convention as registry).
+        // Reactive's StrategyRSC callbacks arrive with tx.origin = deployer wallet.
         CrossHedgeVault vault = new CrossHedgeVault(
             IERC20(address(usdc)),
             "CrossHedge USDC", "chUSDC",
             pm,
             ICrossHedgeHook(hookAddr),
             INettingRegistry(address(registry)),
-            callbackProxy, strategyRvm,
+            callbackProxy, deployer,    // ← was strategyRvm; now deployer
             MAX_SLIPPAGE_BPS,
             PER_BLOCK_SWAP_CAP,
             TWAP_WINDOW

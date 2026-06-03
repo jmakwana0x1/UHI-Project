@@ -77,10 +77,16 @@ contract OpenPosition is Script {
             hooks: IHooks(hookAddr)
         });
 
-        // 4) Open an LP position in a tight range around tick 0
-        int24 tl = int24(-600);
-        int24 tu = int24(600);
-        int256 liquidityDelta = 1e10;
+        // 4) Open an LP position. Tick range and liquidity configurable via env:
+        //    POSITION_TICK_LOWER (default -600)
+        //    POSITION_TICK_UPPER (default 600)
+        //    POSITION_LIQUIDITY  (default 1e10)
+        //
+        // For an above-range "short" position on a pool initialized at tick 0,
+        // use POSITION_TICK_LOWER=600 POSITION_TICK_UPPER=1200.
+        int24 tl = int24(int256(vm.envOr("POSITION_TICK_LOWER", int256(-600))));
+        int24 tu = int24(int256(vm.envOr("POSITION_TICK_UPPER", int256(600))));
+        int256 liquidityDelta = vm.envOr("POSITION_LIQUIDITY", int256(1e10));
 
         console2.log("");
         console2.log("Opening LP position:");

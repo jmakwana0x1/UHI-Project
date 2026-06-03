@@ -48,6 +48,14 @@ contract CrossHedgeHook is BaseHook, ICrossHedgeHook {
     uint16 public immutable premiumBps;
     bool public immutable usdcIsToken0;
 
+    // ─── Constants ──────────────────────────────────────────────────────────
+
+    /// @notice Annualized vol assumption for syntheticShortDelta credit.
+    /// @dev    MVP constant. ETH realized vol historically 50-80% annualized;
+    ///         60% is a defensible middle. v3 will source from StrategyRSC's
+    ///         VolEMA or a dedicated vol oracle.
+    uint256 internal constant ANNUALIZED_VOL_E18 = 0.6e18;
+
     // ─── Per-pool state ─────────────────────────────────────────────────────
 
     struct PoolState {
@@ -197,10 +205,27 @@ contract CrossHedgeHook is BaseHook, ICrossHedgeHook {
             params.tickUpper
         );
 
-        // Compute signed delta (long side).
-        int256 signedDelta = DeltaMath.spotEthDelta(
-            liq, sqrtP, params.tickLower, params.tickUpper, usdcIsToken0
-        );
+        // Compute signed delta. The sign depends on the position's location
+        // relative to the current pool tick:
+        //   - tickLower >= currentTick  → above-range, holds USDC only, SHORT ETH
+        //     (synthetic delta credit weighted by P(price reaches range))
+        //   - otherwise (in-range or below-range) → LONG ETH (spot delta)
+        int24 currentTick = TickMath.getTickAtSqrtPrice(sqrtP);
+        int256 signedDelta;
+        if (params.tickLower >= currentTick) {
+            uint160 sqrtL = TickMath.getSqrtPriceAtTick(params.tickLower);
+            uint160 sqrtU = TickMath.getSqrtPriceAtTick(params.tickUpper);
+            uint128 touchProb = DeltaMath.touchProbability(
+                sqrtP, sqrtU, _horizonSeconds(horizonBucket), ANNUALIZED_VOL_E18
+            );
+            signedDelta = DeltaMath.syntheticShortDelta(
+                liq, sqrtL, sqrtU, touchProb, usdcIsToken0
+            );
+        } else {
+            signedDelta = DeltaMath.spotEthDelta(
+                liq, sqrtP, params.tickLower, params.tickUpper, usdcIsToken0
+            );
+        }
         uint128 gammaVal = DeltaMath.gamma(liq, params.tickLower, params.tickUpper, sqrtP);
 
         // Compute posId (mirrors v4's internal position key + poolId).
@@ -401,6 +426,15 @@ contract CrossHedgeHook is BaseHook, ICrossHedgeHook {
     // ═══════════════════════════════════════════════════════════════════════
     //                              Internals
     // ═══════════════════════════════════════════════════════════════════════
+
+    /// @notice Map horizon bucket index to seconds for vol-based math.
+    /// @dev    Buckets: 0=7d, 1=30d, 2=90d, 3=365d (default).
+    function _horizonSeconds(uint8 bucket) private pure returns (uint64) {
+        if (bucket == 0) return 7 days;
+        if (bucket == 1) return 30 days;
+        if (bucket == 2) return 90 days;
+        return 365 days;
+    }
 
     function _decodeHookData(bytes calldata hookData, address fallbackOwner)
         internal

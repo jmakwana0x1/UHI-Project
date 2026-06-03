@@ -3,17 +3,17 @@
     "baseSepolia": "0xa6eA49Ed671B8a4dfCDd34E36b7a75Ac79B8A5a6",
     "unichainSepolia": "0x9299472A6399Fd1027ebF067571Eb3e3D7837FC4"
   },
-  "deployer": "0x2f328Ef3a09e2328EE4cC9D6D52031eD4946575c",
+  "deployer": "0x40eac2787280dF5192375A3F5dAde20d2c04087C",
   "lasna": {
     "chainId": 5318007,
-    "matchingRsc": "0x2f5ECDc61B9d314cD091840F6E7Acd9cfBae3b8a",
-    "strategyRscBase": "0xF1c02abee44BdD90807212fC2e8736f96F732780",
-    "strategyRscUnichain": "0x6038F4b3135a1e46f23e6dc0A9AEE78209BE07F1"
+    "matchingRsc": "0xD0aE4021F44e5F726e4cD92E914e66AeEb181811",
+    "strategyRscBase": "0x0980021dF58afceFa737d7d1Bd69270878CAf905",
+    "strategyRscUnichain": "0x52E79CecA1B98775661e3454d4E68c95e6Ced088"
   },
   "originTemplate": {
-    "registry": "0xF1c02abee44BdD90807212fC2e8736f96F732780",
-    "usdc": "0x2f5ECDc61B9d314cD091840F6E7Acd9cfBae3b8a",
-    "vault": "0x857C617DE825Cc7CfAD24E416D3D6BE62A7d7b48",
-    "weth": "0x6038F4b3135a1e46f23e6dc0A9AEE78209BE07F1"
+    "registry": "0x0980021dF58afceFa737d7d1Bd69270878CAf905",
+    "usdc": "0xD0aE4021F44e5F726e4cD92E914e66AeEb181811",
+    "vault": "0xBc75447Fb7074ba86A85E34992b570b6cdbed127",
+    "weth": "0x52E79CecA1B98775661e3454d4E68c95e6Ced088"
   }
 }

@@ -1,0 +1,19 @@
+{
+  "callbackProxy": "0xa6eA49Ed671B8a4dfCDd34E36b7a75Ac79B8A5a6",
+  "chainId": 84532,
+  "chainName": "Base Sepolia",
+  "deployedAtBlock": 42234749,
+  "deployer": "0x2f328Ef3a09e2328EE4cC9D6D52031eD4946575c",
+  "fee": 3000,
+  "hook": "0x42F4a5f6ab673F614C0152D7481b9e9416C455c2",
+  "initialVaultUsdc": 10000000000000,
+  "matchingRvm": "0x2f5ECDc61B9d314cD091840F6E7Acd9cfBae3b8a",
+  "poolManager": "0x05E73354cFDd6745C338b50BcFDfA3Aa6fA03408",
+  "registry": "0xF1c02abee44BdD90807212fC2e8736f96F732780",
+  "strategyRvm": "0xF1c02abee44BdD90807212fC2e8736f96F732780",
+  "tickSpacing": 60,
+  "usdc": "0x2f5ECDc61B9d314cD091840F6E7Acd9cfBae3b8a",
+  "usdcIsToken0": true,
+  "vault": "0x857C617DE825Cc7CfAD24E416D3D6BE62A7d7b48",
+  "weth": "0x6038F4b3135a1e46f23e6dc0A9AEE78209BE07F1"
+}

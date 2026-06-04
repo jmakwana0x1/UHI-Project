@@ -6,7 +6,7 @@
 
 Built for **UHI9 Hookathon** — targeting **IL Protection**, **Yield Systems**, and **Reactive Network** sponsor tracks.
 
-[**▸ Watch the 5-step cross-chain match**](#-live-demo-end-to-end-cross-chain-match-on-testnet) · [**▸ See live deployments**](#-live-deployments) · [**▸ Reproduce it yourself**](#run-it-yourself)
+[**▸ Watch the 5-step cross-chain match**](#live-demo-end-to-end-cross-chain-match-on-testnet) · [**▸ See live deployments**](#live-deployments) · [**▸ Reproduce it yourself**](#run-it-yourself)
 
 ---
 
@@ -16,7 +16,7 @@ Built for **UHI9 Hookathon** — targeting **IL Protection**, **Yield Systems**,
 <tr>
 <td valign="top">
 
-**📖 The story**
+**The story**
 1. [The problem](#1-the-problem-the-60-120m-per-year-leak)
 2. [The insight](#2-the-insight-cow-one-layer-up)
 3. [The architecture](#3-the-architecture)
@@ -26,24 +26,24 @@ Built for **UHI9 Hookathon** — targeting **IL Protection**, **Yield Systems**,
 </td>
 <td valign="top">
 
-**🔬 The evidence**
+**The evidence**
 
-6. [★ Live demo: 5-step cross-chain match](#-live-demo-end-to-end-cross-chain-match-on-testnet)
-7. [Live deployments](#-live-deployments)
-8. [Test suite](#-test-suite)
+6. [Live demo — 5-step cross-chain match (★ the keystone)](#live-demo-end-to-end-cross-chain-match-on-testnet)
+7. [Live deployments](#live-deployments)
+8. [Test suite](#test-suite)
 
 </td>
 <td valign="top">
 
-**🌍 The bigger picture**
+**The bigger picture**
 
-9. [Impact](#-impact)
-10. [Honest roadmap](#-honest-roadmap)
+9. [Impact](#impact)
+10. [Honest roadmap](#honest-roadmap)
 
-**🛠️ Deploy it yourself**
+**Deploy it yourself**
 
 11. [Run it yourself](#run-it-yourself)
-12. [Repository structure](#-repository-structure)
+12. [Repository structure](#repository-structure)
 
 </td>
 </tr>
@@ -134,33 +134,33 @@ flowchart TB
     classDef chain3 fill:#E8F8E8,stroke:#1A8F2E,stroke-width:2px,color:#000
     classDef event fill:#FFF7D6,stroke:#B8860B,stroke-width:1px,color:#000
 
-    subgraph U["🦄 Unichain Sepolia (origin)"]
+    subgraph U["Unichain Sepolia (origin)"]
         Alice["Alice<br/>opens LP"]
         PMU["Uniswap v4<br/>PoolManager"]
         HookU["CrossHedgeHook<br/>• afterAddLiquidity<br/>• charges 0.30% premium via take()<br/>• computes signedDelta<br/>• pushes TWAP sample"]
         RegU["NettingRegistry<br/>• records position<br/>• watchdog liveness check"]
         VaultU["CrossHedgeVault<br/>ERC-4626"]
-        EvtU["📡 LPPositionOpened<br/>(emitted)"]:::event
+        EvtU["LPPositionOpened<br/>(emitted)"]:::event
         Alice --> PMU --> HookU --> RegU
         HookU --> VaultU
         HookU --> EvtU
     end
 
-    subgraph L["⚡ Reactive Lasna (matching layer)"]
+    subgraph L["Reactive Lasna (matching layer)"]
         MRSC["MatchingRSC<br/>• Cron10 tick (~1 min)<br/>• 4-gate pair matching<br/>• emits PairMatched + 2× Callback"]
         SRSCU["StrategyRSC<br/>(Unichain)<br/>Cron100 (~12 min)<br/>vol-EMA + rebalance"]
         SRSCB["StrategyRSC<br/>(Base)<br/>Cron100 (~12 min)<br/>vol-EMA + rebalance"]
-        EvtPM["📡 PairMatched ★<br/>(emitted)"]:::event
+        EvtPM["PairMatched ★<br/>(emitted)"]:::event
         MRSC --> EvtPM
     end
 
-    subgraph B["🔵 Base Sepolia (origin)"]
+    subgraph B["Base Sepolia (origin)"]
         Bob["Bob<br/>opens LP<br/>(above-range)"]
         PMB["Uniswap v4<br/>PoolManager"]
         HookB["CrossHedgeHook<br/>• synthetic short delta<br/>(Reiner-Rubinstein)"]
         RegB["NettingRegistry"]
         VaultB["CrossHedgeVault"]
-        EvtB["📡 LPPositionOpened<br/>(emitted)"]:::event
+        EvtB["LPPositionOpened<br/>(emitted)"]:::event
         Bob --> PMB --> HookB --> RegB
         HookB --> VaultB
         HookB --> EvtB
@@ -199,9 +199,9 @@ Most "reactive" patterns just notify. CrossHedge uses Reactive Network as **thre
 
 | Role | What Reactive does | CrossHedge use |
 |---|---|---|
-| 🎯 **Matching engine** | RVM ingests events, RSC runs Solidity logic on each | MatchingRSC pairs opposing LP positions across chains |
-| 📊 **Market-data feed** | Cross-chain event subscription with no oracle | StrategyRSCs ingest `PriceSnapshot` for realized vol EMA |
-| 🚚 **Settlement layer** | `Callback` events delivered cross-chain by RVM proxy | `recordMatch` + `rebalance` callbacks update origin state |
+| **Matching engine** | RVM ingests events, RSC runs Solidity logic on each | MatchingRSC pairs opposing LP positions across chains |
+| **Market-data feed** | Cross-chain event subscription with no oracle | StrategyRSCs ingest `PriceSnapshot` for realized vol EMA |
+| **Settlement layer** | `Callback` events delivered cross-chain by RVM proxy | `recordMatch` + `rebalance` callbacks update origin state |
 
 One RSC's output (`PairMatched`) becomes another contract's input (`registry.recordMatch` on each origin chain), trustlessly. **That composition is impossible on any other infrastructure.** And it's stunningly cheap:
 
@@ -249,25 +249,25 @@ Both emit `MatchingPaused` and flip `matchingActive` to false. *(These transacti
 
 A short list of the technically-interesting parts. Every item maps to working code with tests.
 
-- **🦄 Real Uniswap v4 hook integration.** The hook charges premium via `poolManager.take()` inside `_afterAddLiquidity`, pushes price snapshots to a circular TWAP buffer, and tracks LP positions in a `NettingRegistry`. Verified on Unichain Sepolia AND Base Sepolia with **identical addresses and same source code on both** — clicking either scanner shows the annotated Solidity.
+- **Real Uniswap v4 hook integration.** The hook charges premium via `poolManager.take()` inside `_afterAddLiquidity`, pushes price snapshots to a circular TWAP buffer, and tracks LP positions in a `NettingRegistry`. Verified on Unichain Sepolia AND Base Sepolia with **identical addresses and same source code on both** — clicking either scanner shows the annotated Solidity.
 
-- **🎯 Deterministic cross-chain coordination.** All non-CREATE2 contract addresses are computed upfront via `vm.computeCreateAddress` from `(deployer, nonce)`. Each contract's constructor references the predicted addresses of its cross-chain counterparts. No oracle, no bridge — addresses match by mathematical necessity. The hook is CREATE2-mined to satisfy v4's hook-flag bitmap; same source, different addresses per chain.
+- **Deterministic cross-chain coordination.** All non-CREATE2 contract addresses are computed upfront via `vm.computeCreateAddress` from `(deployer, nonce)`. Each contract's constructor references the predicted addresses of its cross-chain counterparts. No oracle, no bridge — addresses match by mathematical necessity. The hook is CREATE2-mined to satisfy v4's hook-flag bitmap; same source, different addresses per chain.
 
-- **📐 Synthetic short via Reiner-Rubinstein reflection.** `DeltaMath.syntheticShortDelta` uses the [Reiner-Rubinstein 1991](https://www.amazon.com/Exotic-Options-State-Art-Mark-Rubinstein/dp/B005C0YZ8M) barrier-touch formula: `signedDelta = -2·Φ(d)·maxEth`. An above-range LP position produces a probability-weighted short exposure that's symmetric across both token-orderings (`usdcIsToken0` true or false). This is what lets Alice's long get matched with Bob's above-range LP **as if it were a short.**
+- **Synthetic short via Reiner-Rubinstein reflection.** `DeltaMath.syntheticShortDelta` uses the [Reiner-Rubinstein 1991](https://www.amazon.com/Exotic-Options-State-Art-Mark-Rubinstein/dp/B005C0YZ8M) barrier-touch formula: `signedDelta = -2·Φ(d)·maxEth`. An above-range LP position produces a probability-weighted short exposure that's symmetric across both token-orderings (`usdcIsToken0` true or false). This is what lets Alice's long get matched with Bob's above-range LP **as if it were a short.**
 
-- **💎 Yield-systems primitives** — ERC-4626 vault with `totalAssets()` reflecting both liquid USDC AND the ETH-side value of v4 positions (computed via TWAP from the hook's circular buffer, with a 5% safety buffer for swap fees and price drift). Flash-accounted rebalance via `unlock()` callback. Pendle-style horizon bucketing (7d / 30d / 90d / 365d) so positions only match within compatible maturities.
+- **Yield-systems primitives** — ERC-4626 vault with `totalAssets()` reflecting both liquid USDC AND the ETH-side value of v4 positions (computed via TWAP from the hook's circular buffer, with a 5% safety buffer for swap fees and price drift). Flash-accounted rebalance via `unlock()` callback. Pendle-style horizon bucketing (7d / 30d / 90d / 365d) so positions only match within compatible maturities.
 
-- **⚡ EIP-1153 transient storage for per-block accounting.** The vault's per-block swap cap uses `tload`/`tstore` for the running counter — self-clearing across blocks, zero ongoing storage cost.
+- **EIP-1153 transient storage for per-block accounting.** The vault's per-block swap cap uses `tload`/`tstore` for the running counter — self-clearing across blocks, zero ongoing storage cost.
 
-- **🔐 Reactive auth model done right.** The registry's `authorizedMatchingRvmId` is set to the **deployer wallet** (not the MatchingRSC contract address), because Reactive's `AbstractCallback` convention sets `rvm_id = msg.sender` at construction — which is the deployer. Get this wrong and the callback fails silently; we got it right and the demo proves it.
+- **Reactive auth model done right.** The registry's `authorizedMatchingRvmId` is set to the **deployer wallet** (not the MatchingRSC contract address), because Reactive's `AbstractCallback` convention sets `rvm_id = msg.sender` at construction — which is the deployer. Get this wrong and the callback fails silently; we got it right and the demo proves it.
 
-- **🛡️ MEV-aware matching** — the matching algorithm uses 4 gates (opposite sign, horizon proximity, gamma similarity, correlation threshold) and a `MatchScore` heuristic that prefers matches with similar liquidity profiles. This is conceptually related to am-AMM auction designs — extract value back to LPs, not to MEV.
+- **MEV-aware matching** — the matching algorithm uses 4 gates (opposite sign, horizon proximity, gamma similarity, correlation threshold) and a `MatchScore` heuristic that prefers matches with similar liquidity profiles. This is conceptually related to am-AMM auction designs — extract value back to LPs, not to MEV.
 
-- **✅ 423 tests, all passing.** Unit + integration + e2e + 7 fork tests against the live Unichain Sepolia v4 PoolManager. Fork tests caught production bugs that mocks would have missed.
+- **423 tests, all passing.** Unit + integration + e2e + 7 fork tests against the live Unichain Sepolia v4 PoolManager. Fork tests caught production bugs that mocks would have missed.
 
 ---
 
-## ★ Live demo: end-to-end cross-chain match on testnet
+## Live demo: end-to-end cross-chain match on testnet
 
 CrossHedge runs end-to-end across three live testnets. **Two LPs on different chains, with opposite delta exposure, paired peer-to-peer by an autonomous on-chain matching engine, with both registries updated by callback in under two minutes.**
 
@@ -278,40 +278,40 @@ Every step is verifiable. Every link below opens the actual transaction on its b
 ```mermaid
 sequenceDiagram
     autonumber
-    participant Alice as 👤 Alice<br/>(Unichain Sepolia)
-    participant HookU as 🦄 Hook (Unichain)
-    participant RVM as ⚡ Reactive RVM
-    participant MRSC as 🎯 MatchingRSC<br/>(Lasna)
-    participant HookB as 🔵 Hook (Base)
-    participant Bob as 👤 Bob<br/>(Base Sepolia)
-    participant RegU as 📒 Registry (Unichain)
-    participant RegB as 📒 Registry (Base)
+    participant Alice as Alice<br/>(Unichain Sepolia)
+    participant HookU as Hook (Unichain)
+    participant RVM as Reactive RVM
+    participant MRSC as MatchingRSC<br/>(Lasna)
+    participant HookB as Hook (Base)
+    participant Bob as Bob<br/>(Base Sepolia)
+    participant RegU as Registry (Unichain)
+    participant RegB as Registry (Base)
 
     Alice->>HookU: addLiquidity(ticks -600..+600)
     HookU->>HookU: signedDelta = +147,765,054,395,685 wei
-    HookU->>RVM: 📡 LPPositionOpened
-    Note over Alice,HookU: ✅ Step 1: Alice opens LONG
+    HookU->>RVM: LPPositionOpened
+    Note over Alice,HookU: Step 1: Alice opens LONG
 
     Bob->>HookB: addLiquidity(ticks 600..1200, above-range)
     HookB->>HookB: signedDelta = -66,924,521,032,319 wei<br/>(synthetic short, Reiner-Rubinstein)
-    HookB->>RVM: 📡 LPPositionOpened
-    Note over Bob,HookB: ✅ Step 2: Bob opens SHORT
+    HookB->>RVM: LPPositionOpened
+    Note over Bob,HookB: Step 2: Bob opens SHORT
 
     RVM->>MRSC: deliver Alice's event (~15s)
     RVM->>MRSC: deliver Bob's event (~15s)
 
     Note over MRSC: Cron10 tick fires (~1 min)<br/>4 gates: sign ✓ horizon ✓<br/>gamma ✓ correlation ✓
 
-    MRSC->>MRSC: 🌟 PairMatched
-    Note over MRSC: ✅ Step 3: PairMatched on Lasna<br/>(THE KEYSTONE)
+    MRSC->>MRSC: PairMatched
+    Note over MRSC: Step 3: PairMatched on Lasna<br/>(THE KEYSTONE)
 
     MRSC-->>RegU: Callback(recordMatch)
-    RegU->>RegU: 📒 MatchRecorded
-    Note over RegU: ✅ Step 4: Match durable on Unichain
+    RegU->>RegU: MatchRecorded
+    Note over RegU: Step 4: Match durable on Unichain
 
     MRSC-->>RegB: Callback(recordMatch)
-    RegB->>RegB: 📒 MatchRecorded
-    Note over RegB: ✅ Step 5: Match durable on Base
+    RegB->>RegB: MatchRecorded
+    Note over RegB: Step 5: Match durable on Base
 ```
 
 ### The headline transactions
@@ -328,23 +328,24 @@ The Lasna `PairMatched` transaction (step 3) is the keystone. Open it in the sca
 
 ### What's verifiable on-chain today
 
-Every row below is backed by a clickable on-chain artifact.
+Each row below stands on its own. Click the link, read the on-chain receipt, move to the next row.
 
-| Claim | Status | Evidence |
-|---|:-:|---|
-| Hook fires on real v4 with `LPPositionOpened` + `PriceSnapshot` | ✅ | Steps 1 & 2 above |
-| Origin contracts at predicted addresses on both chains | ✅ | See [Live deployments](#-live-deployments). Same address on both chains by construction. Source verified on Uniscan and Basescan for all 5 production contracts. |
-| All 3 RSCs at predicted addresses on Reactive Lasna | ✅ | [MatchingRSC on Lasna scanner](https://lasna.reactscan.net/address/0x40eac2787280df5192375a3f5dade20d2c04087c/contract/0xd0ae4021f44e5f726e4cd92e914e66aeeb181811). Source verified via [Sourcify](https://sourcify.dev), Reactive's [canonical verifier](https://dev.reactive.network/origins-and-destinations#verifying-reactive-contracts). |
-| Cross-chain event delivery: origin hook → MatchingRSC | ✅ | Inspect the Lasna RVM tx list — recent React transactions show origin = Unichain and Base. |
-| **`PairMatched` event with two opposite-delta LPs** ★ | ✅ | [Lasna tx `0x69a7e521…`](https://lasna.reactscan.net/tx/0x69a7e521699c64d0e7a61a4549b64e3800e93a21e0825fe9752db1715507a3ee) — the keystone |
-| Cross-chain callback delivery: MatchingRSC → both registries | ✅ | Steps 4 & 5 above. Lasna tx page shows both callbacks "successfully delivered and confirmed." |
-| Watchdog detects MatchingRSC silence and pauses premium collection | ✅ | See [§4 Watchdog](#4-cant-fail-silently--the-watchdog) |
+| What we claim | On-chain receipt |
+|---|---|
+| Hook fires on real Uniswap v4, emits `LPPositionOpened` with positive `signedDelta` for an in-range LP | [Unichain Sepolia tx `0x3446e2b8…010fad0c`](https://sepolia.uniscan.xyz/tx/0x3446e2b84dd59c86a617dbb0ce3942db8e94b7c63cb207a7be587fe9010fad0c) — block 53,632,665 |
+| Same hook on a second chain, emits `LPPositionOpened` with **negative `signedDelta`** for an above-range LP (synthetic short via Reiner-Rubinstein) | [Base Sepolia tx `0xe197dd77…312496be`](https://sepolia.basescan.org/tx/0xe197dd77c3b6209dbe3efc71dc9bc15bdb07db8c899f51641169ed35312496be) — block 42,358,413 |
+| **`PairMatched` event fires on Reactive Lasna with two opposite-delta LPs (the keystone)** | [Lasna tx `0x69a7e521…507a3ee`](https://lasna.reactscan.net/tx/0x69a7e521699c64d0e7a61a4549b64e3800e93a21e0825fe9752db1715507a3ee) — block 3,717,881. Decode logs to see `matchId`, `longPosId` (Alice's), `shortPosId` (Bob's), `matchedNotional`. |
+| Reactive's RVM delivers `recordMatch` callback back to the Unichain registry, which emits `MatchRecorded` | [Unichain callback tx `0x361b3584…ab70295b`](https://sepolia.uniscan.xyz/tx/0x361b3584d1f48cc30b06925fe66c8a97c9b7d6d682b0e77ff3f92d11ab70295b) — block 53,632,695 |
+| Same callback pattern delivers to the Base registry — same `matchId`, durable on the second chain | [Base callback tx `0x9593df41…5e932b9d`](https://sepolia.basescan.org/tx/0x9593df4122831231939a769ab6fdb2cb793128ad898b8e58b1085b675e932b9d) — block 42,358,418 |
+| All 5 production contracts deployed at **identical addresses** on both origin chains, with **source code verified** on Uniscan and Basescan | [MatchingRegistry on Unichain](https://sepolia.uniscan.xyz/address/0x0980021dF58afceFa737d7d1Bd69270878CAf905) ↔ [same address on Base](https://sepolia.basescan.org/address/0x0980021dF58afceFa737d7d1Bd69270878CAf905). Open both: same source, same address. |
+| All 3 Reactive Smart Contracts on Lasna verified via Sourcify (Reactive's [canonical verifier](https://dev.reactive.network/origins-and-destinations#verifying-reactive-contracts)) | [MatchingRSC on Lasna scanner](https://lasna.reactscan.net/address/0x40eac2787280df5192375a3f5dade20d2c04087c/contract/0xd0ae4021f44e5f726e4cd92e914e66aeeb181811) — click "Contract" tab |
+| Watchdog detects MatchingRSC silence and emits `MatchingPaused`, flipping `matchingActive` to false and disabling premium charges | [Unichain pause tx `0x9778343297…b1c3f57bb`](https://sepolia.uniscan.xyz/tx/0x9778343297fddbd4666d60d834c91e555e16ce24c849fb3b49b2726b1c3f57bb) and [Base pause tx `0x159a5586c3…bc49d610`](https://sepolia.basescan.org/tx/0x159a5586c32a65bd05f07a3fa2161b005fa301adc35937fc6c2c1280bc49d610) |
 
-> **A note on the short side.** Bob's `-66,924,521,032,319` signedDelta is a **synthetic short delta**, computed inside the hook from his above-range LP position using a probability-weighted barrier model (Reiner-Rubinstein reflection principle, `2·Φ(d) · maxEth`). It correctly produces opposite-signed exposure for matching, but the position itself is still an LP, not a borrowed-and-sold short. Closing the residual delta with a real perp is the first item on the [honest roadmap](#-honest-roadmap) below.
+> **A note on the short side.** Bob's `-66,924,521,032,319` signedDelta is a **synthetic short delta**, computed inside the hook from his above-range LP position using a probability-weighted barrier model (Reiner-Rubinstein reflection principle, `-2·Φ(d) · maxEth`). It correctly produces opposite-signed exposure for matching, but the position itself is still an LP, not a borrowed-and-sold short. Closing the residual delta with a real perp is the first item on the [honest roadmap](#honest-roadmap) below.
 
 ---
 
-## 🌐 Live deployments
+## Live deployments
 
 **Deployer:** [`0x40eac2787280dF5192375A3F5dAde20d2c04087C`](https://sepolia.uniscan.xyz/address/0x40eac2787280dF5192375A3F5dAde20d2c04087C)
 
@@ -386,7 +387,7 @@ By construction, the same contract slot on Unichain and Base resolves to the **s
 
 ---
 
-## 🧪 Test suite
+## Test suite
 
 ```
 $ forge test
@@ -433,7 +434,7 @@ Generated with `forge coverage --report summary`. Scripts (deploy / openPosition
 
 ---
 
-## 🌍 Impact
+## Impact
 
 Every dollar here comes from a leak that already exists. We're not manufacturing yield. We're **redirecting yield that arbitrageurs take today**, at an infrastructure cost that's a rounding error.
 
@@ -453,7 +454,7 @@ The leak doesn't go away. **It just stops being someone else's lunch.**
 
 ---
 
-## 🛣️ Honest roadmap
+## Honest roadmap
 
 We know exactly what's next:
 
@@ -552,7 +553,7 @@ Gas cost (Unichain Sepolia + Base Sepolia combined): well under 0.001 ETH at tes
 
 ### 4. Reproduce the cross-chain match (Alice + Bob)
 
-To reproduce the full five-step match chain from [Live demo](#-live-demo-end-to-end-cross-chain-match-on-testnet):
+To reproduce the full five-step match chain from [Live demo](#live-demo-end-to-end-cross-chain-match-on-testnet):
 
 ```bash
 # 1. Alice opens an in-range LONG on Unichain Sepolia (positive signedDelta)
@@ -566,10 +567,10 @@ POSITION_TICK_UPPER=1200 \
 forge script script/OpenPosition.s.sol --rpc-url $BASE_SEPOLIA_RPC --broadcast
 
 # 3. Wait ~2 minutes for the full cycle:
-#    - Reactive RVM delivers both LPPositionOpened events to MatchingRSC on Lasna
-#    - Cron10 tick fires; MatchingRSC pairs candidates; emits PairMatched
-#    - Two Callback events fan out to both origin registries
-#    - Each registry's recordMatch() executes, emitting MatchRecorded
+# - Reactive RVM delivers both LPPositionOpened events to MatchingRSC on Lasna
+# - Cron10 tick fires; MatchingRSC pairs candidates; emits PairMatched
+# - Two Callback events fan out to both origin registries
+# - Each registry's recordMatch() executes, emitting MatchRecorded
 
 # 4. Verify lastMatchingCallback advanced on both registries
 cast call $REGISTRY "lastMatchingCallback()(uint64)" --rpc-url $UNICHAIN_SEPOLIA_RPC
@@ -581,7 +582,7 @@ The `lastMatchingCallback` field is only updated by `_touchWatchdog()` inside `r
 
 ---
 
-## 📂 Repository structure
+## Repository structure
 
 ```
    src/

@@ -205,13 +205,15 @@ Most "reactive" patterns just notify. CrossHedge uses Reactive Network as **thre
 
 One RSC's output (`PairMatched`) becomes another contract's input (`registry.recordMatch` on each origin chain), trustlessly. **That composition is impossible on any other infrastructure.** And it's stunningly cheap:
 
-| Architecture | Annual operating cost |
-|---|---:|
-| Centralized keeper + bridge | **~$220,000** |
-| Chainlink Automation | **>$220,000** |
-| **CrossHedge on Reactive Network** | **~$2,000** |
+| Architecture | Annual operating cost | Notes |
+|---|---:|---|
+| Chainlink Automation + CCIP | **~$547,000** | Pays destination gas on every cron tick (~1M txs/yr × 2 chains) |
+| Centralized keeper (production SRE) | **~$86,000** | Plus the same destination gas; plus the trust assumption |
+| **CrossHedge on Reactive Network** | **~$8,000** | Pays destination gas only on actual matches (~36k callbacks/yr) |
 
-**100× cheaper.** Nothing to trust beyond the chain itself.
+**~66× cheaper than Chainlink at typical L2 mainnet conditions — and the ratio holds at any gas regime, from quiet (87×) to congested (66×).** The structural advantage: Reactive only pays destination gas on successful matches, while Chainlink Automation must pay on every cron tick. Reactive moves ~30× less destination traffic for the same workload.
+
+See [`COST_DEFENSE.md`](./cost-analysis/cost-analysis.md) for the full first-principles derivation, sensitivity tables, and a reproducible Python script ([`cost_analysis.py`](./cost-analysis/cost_analysis.py)). Every assumption is transparent; every number is checkable.
 
 ---
 

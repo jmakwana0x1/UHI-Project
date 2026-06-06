@@ -584,15 +584,16 @@ sequenceDiagram
 
     Note over MRSC: Day 0 + ~1 minute<br/>(Cron10 tick fires)
     MRSC->>MRSC: 4-gate match against<br/>Vault's above-range tranche
-    MRSC->>Reg: Callback: recordMatch(Alice, Vault, 50k USDC)
+    MRSC->>Reg: Callback recordMatch(Alice, Vault, 50k USDC)
 
     Note over Reg: Days 1..30 — accrual<br/>50,000 × 8% APR
     Reg->>Reg: accrue rebate to vault<br/>~10.96 USDC/day
 
     Note over Alice,Vault: Day 30 — natural settlement
     Reg->>Vault: final accrual: 328.77 USDC
-    Reg->>Reg: clear matched state; positions free to re-match
+    Reg->>Reg: clear matched state, positions free to re-match
 ```
+
 
 Day 0 + about one minute. The matching engine runs its cron. It places Alice in the long queue. It looks for a compatible short. It finds the vault's above-range tranches at range $4,500 to $5,000, with synthetic short delta of approximately 13 ETH-equivalent. The match score is good. The engine emits a cross-chain instruction recording the match.
 

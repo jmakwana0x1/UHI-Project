@@ -236,14 +236,14 @@ CrossHedge's `NettingRegistry` has a built-in watchdog that detects MatchingRSC 
 
 **The protocol cannot silently under-hedge.** If the matching engine goes offline — by design (kill switch), by accident (network issue), or by malice (RSC funds depleted) — the hook detects the silence and stops charging premiums until callbacks resume.
 
-We demonstrated this live on both chains by calling `pingWatchdog()` after the deploy-time heartbeat staled:
+We demonstrated this live on both chains — by calling `pingWatchdog()` after the deploy-time heartbeat staled — on an earlier deployment of the identical registry contract (same bytecode, same `MatchingPaused` code path as the current deploy):
 
 | Chain | Watchdog pause tx |
 |---|---|
 | Unichain Sepolia | [`0x9778343297…b1c3f57bb`](https://sepolia.uniscan.xyz/tx/0x9778343297fddbd4666d60d834c91e555e16ce24c849fb3b49b2726b1c3f57bb) |
 | Base Sepolia | [`0x159a5586c3…bc49d610`](https://sepolia.basescan.org/tx/0x159a5586c32a65bd05f07a3fa2161b005fa301adc35937fc6c2c1280bc49d610) |
 
-Both emit `MatchingPaused` and flip `matchingActive` to false. *(These transactions are from an earlier deployment of the identical registry contract — the watchdog code path is the same on the current deploy.)*
+Both emit `MatchingPaused` and flip `matchingActive` to false.
 
 ---
 
@@ -440,6 +440,8 @@ Generated with `forge coverage --report summary`. Scripts (deploy / openPosition
 
 Every dollar here comes from a leak that already exists. We're not manufacturing yield. We're **redirecting yield that arbitrageurs take today**, at an infrastructure cost that's a rounding error.
 
+**No token emissions. No inflationary rewards.** Every dollar of yield is real premium flow — paid today to volatility, redirected tomorrow to LPs and vault depositors. The vault earns a **~14% modeled blended APY** in normal volatility regimes, sourced from three structural cash flows — matched-long funding, swap fees on activated tranches, and a share of entry premiums — not from a printed token. The full regime-by-regime derivation (calm ~9% → stress ~38%) is in [`WHITEPAPER.md` Part IV.6](./WHITEPAPER.md).
+
 Conservatively, early adoption returns **over $1M/year** to LPs and vault depositors. At mature scale, several times that.
 
 ```
@@ -453,6 +455,8 @@ Conservatively, early adoption returns **over $1M/year** to LPs and vault deposi
 ```
 
 The leak doesn't go away. **It just stops being someone else's lunch.**
+
+> **A note on the percentages in this repo.** Three distinct rates appear across the docs, and they mean different things: the **0.30%** one-time *entry premium* charged by the hook; the internal *funding rate* on matched notional (the whitepaper models this at **8% APR**; some test fixtures and worked examples use other values — e.g. the e2e test runs at 12% APR — to exercise the accrual math); and the vault's **~14% blended APY**, which is the depositor's all-in yield from all three cash-flow sources combined. Entry premium ≠ funding rate ≠ vault APY.
 
 ---
 

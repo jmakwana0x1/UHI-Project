@@ -36,5 +36,5 @@ reactive_lasna   = "${REACTIVE_LASNA_RPC}"
 [etherscan]
 unichain_sepolia = { key = "${UNISCAN_API_KEY}" }
 base_sepolia     = { key = "${BASESCAN_API_KEY}" }
-
+# A Uniswap v4 hook + Reactive Network protocol that hedges impermanent loss for liquidity providers by matching opposing LP risk peer-to-peer across chains — no bridge, no keeper, no off-chain solver. An ERC-4626 vault is the always-available counterparty, redirecting value that today leaks to MEV back to LPs and depositors. UHI9 Hookathon submission.
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

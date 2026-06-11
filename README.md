@@ -2,7 +2,7 @@
 
 > **CoW for LP risk.** A Uniswap v4 hook + Reactive Network protocol that hedges impermanent loss for liquidity providers by matching their positions peer-to-peer across chains — entirely on-chain, no bridge, no keeper, no off-chain solver.
 
-> *Value redirection, where there was only extraction.*
+> **Impermanent loss protection, done as a yield system.** The same cash flow is a hedge from the LP's side and yield from the depositor's side. *Value redirection, where there was only extraction.*
 
 Built for **UHI9 Hookathon** — targeting **IL Protection**, **Yield Systems**, and **Reactive Network** sponsor tracks.
 
@@ -182,16 +182,18 @@ flowchart TB
 
 | Contract | What it does |
 |---|---|
-| **CrossHedgeHook** | A Uniswap v4 hook on `afterAddLiquidity`. Computes a `signedDelta` for the LP position (positive for long, synthetic-negative for above-range short via Reiner-Rubinstein reflection), charges a 0.30% premium via `poolManager.take()`, pushes a sample to a circular TWAP buffer, and registers the position with NettingRegistry. |
-| **NettingRegistry** | Tracks all open positions and matched pairs. Receives `recordMatch` callbacks from MatchingRSC via Reactive's callback proxy. Includes a watchdog that pauses matching if MatchingRSC goes silent for > 30 minutes. |
-| **CrossHedgeVault** | ERC-4626 vault holding USDC. Acts as the always-available counterparty for unmatched residual delta. Tracks ETH-side value of v4 positions via TWAP. Rebalanced by StrategyRSC via cross-chain callback. EIP-1153 transient storage for per-block swap cap (zero ongoing storage cost). |
+| [**CrossHedgeHook**](./src/hook/CrossHedgeHook.sol) | A Uniswap v4 hook on `afterAddLiquidity`. Computes a `signedDelta` for the LP position (positive for long, synthetic-negative for above-range short via Reiner-Rubinstein reflection), charges a 0.30% premium via `poolManager.take()`, pushes a sample to a circular TWAP buffer, and registers the position with NettingRegistry. |
+| [**NettingRegistry**](./src/registry/NettingRegistry.sol) | Tracks all open positions and matched pairs. Receives `recordMatch` callbacks from MatchingRSC via Reactive's callback proxy. Includes a watchdog that pauses matching if MatchingRSC goes silent for > 30 minutes. |
+| [**CrossHedgeVault**](./src/vault/CrossHedgeVault.sol) | ERC-4626 vault holding USDC. Acts as the always-available counterparty for unmatched residual delta. Tracks ETH-side value of v4 positions via TWAP. Rebalanced by StrategyRSC via cross-chain callback. EIP-1153 transient storage for per-block swap cap (zero ongoing storage cost). |
 
 ### Three Reactive Smart Contracts on Reactive Lasna
 
 | RSC | Cadence | What it does |
 |---|---|---|
-| **MatchingRSC** | `Cron10` (~1 min) + per-event | Subscribes to `LPPositionOpened` on both origin chains. Maintains a candidate pool (max 32). Runs 4-gate greedy pair matching (sign, horizon, gamma, correlation) on every cron tick. Emits cross-chain `recordMatch` callbacks on success. |
-| **StrategyRSC** × 2 | `Cron100` (~12 min) + per-event | One per origin chain. Tracks per-chain realized volatility (EMA). Computes vault delta-target from unmatched flow. Emits cross-chain `rebalance` callbacks on threshold crossings. |
+| [**MatchingRSC**](./src/reactive/MatchingRSC.sol) | `Cron10` (~1 min) + per-event | Subscribes to `LPPositionOpened` on both origin chains. Maintains a candidate pool (max 32). Runs 4-gate greedy pair matching (sign, horizon, gamma, correlation) on every cron tick. Emits cross-chain `recordMatch` callbacks on success. |
+| [**StrategyRSC**](./src/reactive/StrategyRSC.sol) × 2 | `Cron100` (~12 min) + per-event | One per origin chain. Tracks per-chain realized volatility (EMA). Computes vault delta-target from unmatched flow. Emits cross-chain `rebalance` callbacks on threshold crossings. |
+
+**Where in the code:** the subscriptions and matching logic live in [`src/reactive/`](./src/reactive/) (with the heap, vol-EMA, and ring buffer in [`modules/`](./src/reactive/modules/)); the origin-side events they consume are emitted by [`CrossHedgeHook.sol`](./src/hook/CrossHedgeHook.sol); and their cross-chain callbacks land in [`NettingRegistry.recordMatch()`](./src/registry/NettingRegistry.sol) and [`CrossHedgeVault.rebalance()`](./src/vault/CrossHedgeVault.sol).
 
 ### Why Reactive is essential — three roles in one primitive
 
@@ -438,9 +440,9 @@ Generated with `forge coverage --report summary`. Scripts (deploy / openPosition
 
 ## Impact
 
-Every dollar here comes from a leak that already exists. We're not manufacturing yield. We're **redirecting yield that arbitrageurs take today**, at an infrastructure cost that's a rounding error.
+**CrossHedge is impermanent loss protection, done as a yield system.** Every dollar here comes from a leak that already exists. We're not manufacturing yield. We're **redirecting yield that arbitrageurs take today**, at an infrastructure cost that's a rounding error.
 
-**No token emissions. No inflationary rewards.** Every dollar of yield is real premium flow — paid today to volatility, redirected tomorrow to LPs and vault depositors. The vault earns a **~14% modeled blended APY** in normal volatility regimes, sourced from three structural cash flows — matched-long funding, swap fees on activated tranches, and a share of entry premiums — not from a printed token. The full regime-by-regime derivation (calm ~9% → stress ~38%) is in [`WHITEPAPER.md` Part IV.6](./WHITEPAPER.md).
+**No token emissions. No inflationary rewards.** Every dollar of yield is real premium flow — paid today to volatility, redirected tomorrow to LPs and vault depositors. The vault earns a **~14% modeled blended APY** in normal volatility regimes, sourced from three structural cash flows — matched-long funding, swap fees on activated tranches, and a share of entry premiums — not from a printed token. The full regime-by-regime derivation (calm ~9% → stress ~38%) is in [`whitepaper.md` Part IV.6](./whitepaper.md).
 
 Conservatively, early adoption returns **over $1M/year** to LPs and vault depositors. At mature scale, several times that.
 

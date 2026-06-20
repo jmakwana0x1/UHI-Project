@@ -6,6 +6,8 @@
 
 Built for **UHI9 Hookathon** — targeting **IL Protection**, **Yield Systems**, and **Reactive Network** sponsor tracks.
 
+**UNISWAP HOOK INCUBATOR PRIZE WINNER**
+
 [**▸ Watch the 5-step cross-chain match**](#live-demo-end-to-end-cross-chain-match-on-testnet) · [**▸ See live deployments**](#live-deployments) · [**▸ Reproduce it yourself**](#run-it-yourself)
 
 ---
